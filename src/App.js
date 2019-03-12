@@ -1,45 +1,34 @@
-import React, { useState, useEffect, Fragment} from 'react';
-import { fetchData} from "./data";
+import React, { useReducer } from 'react';
+import { initialState, reducer} from "./reducer";
+import { delay} from "./helper";
 
 const App = () => {
-    const [data, setData] = useState({hits: []});
-    const [query, setQuery] = useState('redux');
-    const [search, setSearch] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [isError, setError] = useState(false);
 
-    useEffect( () => {
-       fetchData(setData, query, setIsLoading, setError);
-    }, [search]);
+       const [{count, loading}, dispatch] = useReducer(reducer, initialState);
+
+       const onHandleIncrement = async () => {
+           dispatch({type: 'loading'});
+           await delay(500);
+           dispatch({type: 'increment'});
+       };
+
+        const onHandleDecrement = async () => {
+            dispatch({ type: 'loading' });
+            await delay(500);
+            dispatch({ type: 'decrement' });
+    };
 
     return (
-
-        <Fragment>
-            <input
-            type="text"
-            value={query}
-            onChange={event => setQuery(event.target.value)}
-            />
-            <button
-                type="button"
-                onClick={() => setSearch(query)}
-            >Search</button>
-            { isError && <div>Something went wrong ...</div> }
-            {
-                isLoading ? ( <div>Loading ...</div>) :
-                    (<ul>
-                    {data.hits.map(item =>(
-                        <li key={item.objectID}>
-                            <a href={item.url}>{item.title}</a>
-                        </li>
-                    ))}
-
-                </ul>)
-
-            }
-
-        </Fragment>
-    )
-};
+        <div>
+            <p>Count {loading ? 'loading..' : count}</p>
+            <button type="button" onClick={onHandleIncrement}>
+                +
+            </button>
+            <button type="button" onClick={onHandleDecrement}>
+                -
+            </button>
+        </div>
+    );
+   };
 
 export default App;
